@@ -17,6 +17,9 @@ To replicate this project, you will need the following parts:
 
 ## 🎮 Phase 1: Manual Control (Bluetooth)
 
+<img width="478" height="850" alt="robot" src="https://github.com/user-attachments/assets/a1d4474d-0b57-4111-bd42-6c51fad623fa" />
+
+
 ### ⚡ Electric Scheme
 
 > **Hardware Note:** In the real assembly, we use three 210-ohm resistors in parallel. This ensures a continuous current draw so the power bank registers the consumption and does not shut down automatically.
@@ -27,7 +30,7 @@ To replicate this project, you will need the following parts:
 
 <img width="512" height="350" alt="Real Assembly Top" src="https://github.com/user-attachments/assets/568e49f3-5aba-4d31-a733-9d8b42f94278" />
 
-<img width="400" height="563" alt="Real Assembly Side" src="https://github.com/user-attachments/assets/1dc87419-bfee-4feb-a7da-03bf31cf41c2" />
+<img width="240" height="363" alt="Real Assembly Side" src="https://github.com/user-attachments/assets/1dc87419-bfee-4feb-a7da-03bf31cf41c2" />
 
 ### Programming
 
@@ -50,3 +53,7 @@ The protocol is rather simple, the user sends a string with the comands and ends
 To facilitate myself the communication I made a simple interface using MIT App inventor 
 
 https://github.com/AutoPtrLab/Differential-Robot-Bluetooth-Autonomous/releases/tag/Bluetooth_Controller
+
+### VIDEOS
+ https://youtube.com/shorts/GyfELeh25M4?si=cqAGC58dihnduHg8
+ https://youtube.com/shorts/uWUYhGvj8_0?si=G7VaVpL7Wf5WP6yT
