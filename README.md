@@ -2,6 +2,19 @@
 
 A robotics project consisting of assembling and programming a 2-Wheel-Drive (2WD) differential car. The project is divided into two main phases: manual teleoperation via Bluetooth, followed by fully autonomous navigation.
 
+### 🛒 Hardware Components (Bill of Materials)
+
+To replicate this project, you will need the following parts:
+
+*   **Microcontroller:** Texas Instruments MSP430F5529 LaunchPad
+*   **Wireless Communication:** HC-05 Bluetooth Module
+*   **Motor Driver:** TB6612FNG Dual Motor Driver (More efficient than standard L298N)
+*   **Chassis & Actuators:** 2WD Robot Chassis Kit (Includes 2x DC Motors and wheels)
+*   **Power Supply (Logic):** Standard USB Power Bank 
+    * *(Includes the custom 3x 210Ω parallel resistor circuit to prevent auto-shutdown)*
+*   **Power Supply (Motors):** External Battery Pack (to independently power the TB6612FNG and motors)
+*   **Prototyping:** Standard Breadboard and jumper wires
+
 ## 🎮 Phase 1: Manual Control (Bluetooth)
 
 ### ⚡ Electric Scheme
@@ -12,9 +25,9 @@ A robotics project consisting of assembling and programming a 2-Wheel-Drive (2WD
 
 ### 🛠️ Real Assembly
 
-<img width="1012" height="759" alt="Real Assembly Top" src="https://github.com/user-attachments/assets/568e49f3-5aba-4d31-a733-9d8b42f94278" />
+<img width="512" height="350" alt="Real Assembly Top" src="https://github.com/user-attachments/assets/568e49f3-5aba-4d31-a733-9d8b42f94278" />
 
-<img width="556" height="663" alt="Real Assembly Side" src="https://github.com/user-attachments/assets/1dc87419-bfee-4feb-a7da-03bf31cf41c2" />
+<img width="400" height="563" alt="Real Assembly Side" src="https://github.com/user-attachments/assets/1dc87419-bfee-4feb-a7da-03bf31cf41c2" />
 
 ### Programming
 
@@ -35,3 +48,5 @@ The protocol is rather simple, the user sends a string with the comands and ends
 
 
 To facilitate myself the communication I made a simple interface using MIT App inventor 
+
+https://github.com/AutoPtrLab/Differential-Robot-Bluetooth-Autonomous/releases/tag/Bluetooth_Controller
