@@ -1,7 +1,5 @@
 #include "distance_sensor.h"
-#include "msp430f5529.h"
-#include "stdbool.h"
-#include <stdint.h>
+
 // Front Sensor:
 //      Trig = P4.2
 //      Echo = P2.5 / TA2.2
@@ -40,8 +38,8 @@ void config_ds() {
   // timer TA2 configuration ,compare mode
   // since the maximun in can reach is 38 ms (when there is no obstacule)
   // we use the 1Mhz and still doesnt overflow
-  TA2CTL &= ~TAIFG;                                // clean int flag
-  TA2CTL |= TASSEL_2 | ID_0 | MC_3 | TACLR | TAIE; // continuos mode and 1Mhz
+  TA2CTL &= ~TAIFG;                         // clean int flag
+  TA2CTL |= TASSEL_2 | ID_0 | MC_2 | TACLR; // continuos mode and 1Mhz
 
   // capture both edges
   TA2CCTL0 &= ~CCIFG;
@@ -50,22 +48,6 @@ void config_ds() {
   TA2CCTL1 |= CM_3 | CAP | CCIE;
   TA2CCTL2 &= ~CCIFG;
   TA2CCTL2 |= CM_3 | CAP | CCIE;
-}
-
-void ds_trig_front() {
-  P4OUT |= BIT2;
-  __delay_cycles(10);
-  P4OUT &= ~BIT2;
-}
-void ds_trig_left() {
-  P3OUT |= BIT2;
-  __delay_cycles(10);
-  P3OUT &= ~BIT2;
-}
-void ds_trig_right() {
-  P8OUT |= BIT1;
-  __delay_cycles(10);
-  P8OUT &= ~BIT1;
 }
 
 // interruption to capture how long was the electrical pulse of the echo pin
@@ -89,14 +71,17 @@ __interrupt void right_ISR(void) {
 // ISR of the CC2 and CC3
 #pragma vector = TIMER2_A1_VECTOR
 __interrupt void left_front_ISR(void) {
+
   // if the int comes form the front sensor
   if (TA2CCTL2 & CCIFG) {
+
     if (TA2CCTL2 & CCI) {
       // the input is ON
       aux_front = TA2R;
     } // if the input is off the pulse has ended and we calculate how many
       // secons has lasted
     else {
+      P4OUT ^= BIT7;
       _ds_front_time = TA2R - aux_front;
       _ready_front = true; // ready to check
     }

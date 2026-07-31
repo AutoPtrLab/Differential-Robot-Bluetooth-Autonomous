@@ -24,7 +24,7 @@
 #ifndef DISTANCE_SENSOR_H
 #define DISTANCE_SENSOR_H
 // global variables
-
+#include <msp430.h>
 #include <stdbool.h>
 #include <stdint.h>
 extern volatile uint16_t _ds_front_time;
@@ -35,10 +35,19 @@ extern volatile bool _ready_front;
 extern volatile bool _ready_left;
 extern volatile bool _ready_right;
 
-// getters
-static inline uint16_t ds_get_front_time() { return _ds_front_time; }
-static inline uint16_t ds_get_left_time() { return _ds_left_time; }
-static inline uint16_t ds_get_right_time() { return _ds_right_time; }
+// get the front time and turns off the is_ready flag
+static inline uint16_t ds_get_front_time() {
+  _ready_front = false;
+  return _ds_front_time;
+}
+static inline uint16_t ds_get_left_time() {
+  _ready_left = false;
+  return _ds_left_time;
+}
+static inline uint16_t ds_get_right_time() {
+  _ready_right = false;
+  return _ds_right_time;
+}
 
 static inline uint16_t ds_right_is_ready() { return _ready_right; }
 static inline uint16_t ds_left_is_ready() { return _ready_left; }
@@ -47,11 +56,23 @@ static inline uint16_t ds_front_is_ready() { return _ready_front; }
 // configures the ports that of the distance sensor
 void config_ds();
 
-// triggers the left distance sensor (blocks the CPU)
-static inline void ds_trig_left();
-// triggers the front distance sensor (blocks the CPU)
-static inline void ds_trig_front();
-// triggers the right distance sensor (blocks the CPU)
-static inline void ds_trig_right();
+// triggers the front sensor
+static inline void ds_trig_front() {
+  P4OUT |= BIT2;
+  __delay_cycles(10);
+  P4OUT &= ~BIT2;
+}
+// triggers the left sensor
+static inline void ds_trig_left() {
+  P3OUT |= BIT2;
+  __delay_cycles(10);
+  P3OUT &= ~BIT2;
+}
+// triggers the right sensor
+static inline void ds_trig_right() {
+  P8OUT |= BIT1;
+  __delay_cycles(10);
+  P8OUT &= ~BIT1;
+}
 
 #endif
