@@ -1,10 +1,11 @@
 #include "motor.h"
 #include "bluetooth.h"
-#include "msp430f5529.h"
+
 #include <ctype.h>
-#include <msp430.h>
+
 #include <stdint.h>
 
+// configuration of the motor pins
 void config_mt() {
   // sets as and exit AIN1 and AIN2
   P1DIR |= BIT4 | BIT5;
@@ -26,22 +27,18 @@ void config_mt() {
   TA0CCTL2 |= OUTMOD_7;
 
   // prepare the STBY pin
-  P2DIR |= BIT2;
+  P8DIR |= BIT2;
   // the clock resets when the counters reachs 50, the velocity of the motor
   // changes with the duty cycles
   TA0CCR0 = 50;
+  TA0CCR2 = 40;
+  TA0CCR1 = 40;
 
-  // Buzzer configuration
-  P2DIR |= BIT4;
-  P2SEL |= BIT4;
-  TA2CTL |= MC_1 + TACLR + TASSEL_2 + ID_0; // 1 Mhz
-  TA2CCTL2 |= OUTMOD_7;
-  TA2CCR2 = 0;
-  TA2CCR0 = 520;
   // we star with the syby
-  P2OUT |= BIT2;
+  P8OUT |= BIT2;
 }
 
+// bluetooth motor control
 void update_mt(char *message) {
 
   switch (message[0]) {
@@ -49,22 +46,19 @@ void update_mt(char *message) {
 
     switch (message[1]) {
     case 'B': // backwards
-      P1OUT |= BIT5;
-      P1OUT &= ~BIT4;
+      mt_left_backward();
       break;
     case 'N': // neutral
       P1OUT &= ~BIT4;
       P1OUT &= ~BIT5;
       break;
     case 'F': // forward
-      P1OUT |= BIT4;
-      P1OUT &= ~BIT5;
+      mt_left_forward();
       break;
 
       break;
     case 'S': // stop ,active brake
-      P1OUT |= BIT5;
-      P1OUT |= BIT4;
+      mt_left_stop();
       break;
     }
     break;
@@ -73,21 +67,18 @@ void update_mt(char *message) {
   case 'R': // right motor
     switch (message[1]) {
     case 'B': // backwards
-      P2OUT |= BIT6;
-      P2OUT &= ~BIT0;
+      mt_right_backward();
       break;
     case 'N': // neutral
       P2OUT &= ~BIT0;
       P2OUT &= ~BIT6;
       break;
     case 'F': // forward
-      P2OUT |= BIT0;
-      P2OUT &= ~BIT6;
+      mt_right_forward();
       break;
 
     case 'S': // stop ,active brake
-      P2OUT |= BIT6;
-      P2OUT |= BIT0;
+      mt_right_stop();
       break;
 
       break;
