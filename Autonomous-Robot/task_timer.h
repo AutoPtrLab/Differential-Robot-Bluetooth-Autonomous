@@ -18,8 +18,7 @@
 #define FRONT_DS_CYCLES (uint16_t)((FRONT_DS_MS * ACLK_HZ) / 1000UL)
 // left and right sensor frequency
 #define LEFT_RIGHT_DS_CYCLES (uint16_t)((LEFT_RIGHT_DS_MS * ACLK_HZ) / 1000UL)
-#define POSITION_UPDATE_CYCLES                                                 \
-  (uint16_t)((POSITION_UPDATE_MS * ACLK_HZ) / 1000UL)
+#define POSITION_UPDATE_CYCLES (uint16_t)((POSITION_UPDATE_MS * ACLK_HZ) / 1000UL)
 
 // configuration of the Master clock that determines the frequency of the tasks
 void config_task_timer();

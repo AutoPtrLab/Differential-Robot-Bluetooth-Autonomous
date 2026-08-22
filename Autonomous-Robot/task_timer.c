@@ -1,11 +1,11 @@
 #include "task_timer.h"
 #include "distance_sensor.h"
-#include "encoder.h"
 #include "msp430f5529.h"
+#include "odometry.h"
 #include "stdbool.h"
 
 void config_task_timer() {
-  TB0CTL = TBCLR | MC_2 | TBSSEL_1 | ID_0 | TBIE; // continous mode, 32 768 Hz,
+  TB0CTL = TBCLR | MC_2 | TBSSEL_2 | ID_0; // continous mode, 32 768 Hz,
 
   // activating the interruptions of the compare blocks
 
@@ -42,22 +42,26 @@ volatile bool _is_update_pos_ready = false;
 __interrupt void ISR(void) {}
 
 // ISR for the rest of the Control registers
-#pragma vector = TIMER0_B1_VECTIR
+#pragma vector = TIMER0_B1_VECTOR
 __interrupt void task_controller(void) {
+
   // front distance sensor
   if (TB0CCTL1 & CCIFG) {
     ds_trig_front();
+    TB0CCR1 += FRONT_DS_CYCLES;
     TB0CCTL1 &= ~CCIFG; // cleaning the int flag
   }
   // right and left distance sensor
   if (TB0CCTL2 & CCIFG) {
     ds_trig_left();
     ds_trig_right();
+    TB0CCR2 += LEFT_RIGHT_DS_CYCLES;
     TB0CCTL2 &= ~CCIFG; // cleaning the int flag
   }
   // position update
   if (TB0CCTL3 & CCIFG) {
     _is_update_pos_ready = true;
+    TB0CCR3 += POSITION_UPDATE_CYCLES;
     TB0CCTL3 &= ~CCIFG; // cleaning the int flag
   }
 }

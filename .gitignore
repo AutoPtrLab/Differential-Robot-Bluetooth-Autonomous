@@ -6,3 +6,4 @@ targetConfigs
 .ccsproject
 .clangd
 .cproject
+.clang-format

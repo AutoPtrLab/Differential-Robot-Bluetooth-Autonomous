@@ -3,13 +3,13 @@
 // microsecons) by 58 so Dist = T / 58
 //
 // the time is provided by the echo pin , it sends a pulse (150 micro sec - 25
-// ms, 38 ms when there is no obstacule) we activate the sensor sending a 10
 // microsec pulse to the trigger pin
 //
 // To measure the time the timerA2 is used.
 // Since the autonomous car has
 // 3 sensors, two on the sides and one on the front the used pins are the
 // following:
+//
 //
 // Front Sensor:
 //      Trig = P4.2

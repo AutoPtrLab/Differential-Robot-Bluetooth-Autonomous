@@ -53,13 +53,13 @@ void config_ds() {
 // interruption to capture how long was the electrical pulse of the echo pin
 
 // the msp430 has two differnte vectores int , one for the compare and capture
-// zero and other for the othe 3 ports
+// zero and other for the other 3 ports
 #pragma vector = TIMER2_A0_VECTOR
 __interrupt void right_ISR(void) {
   if (TA2CCTL0 & CCI) {
     // the input is ON
     aux_right = TA2R;
-  } // if the input is off the pulse has ended and we calculate how many secons
+  } // if the input is off the pulse has ended and we calculate how many seconds
     // has lasted
   else {
     _ds_right_time = TA2R - aux_right;
@@ -79,9 +79,9 @@ __interrupt void left_front_ISR(void) {
       // the input is ON
       aux_front = TA2R;
     } // if the input is off the pulse has ended and we calculate how many
-      // secons has lasted
+      // seconds has lasted
     else {
-      P4OUT ^= BIT7;
+      //P4OUT ^= BIT7;
       _ds_front_time = TA2R - aux_front;
       _ready_front = true; // ready to check
     }

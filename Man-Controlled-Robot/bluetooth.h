@@ -1,7 +1,7 @@
 
 // ==========BLUETOOTH=======
-// Transmitter P3.3
-// Receiver P3.4
+// Transmitter P3.4
+// Receiver P3.3
 
 // the module this project makes uses is a HC-05  with 9600 baudrate and <8 N 1>
 // the protocol we are going to use is simple, a group of chars that always ends

@@ -37,7 +37,7 @@ void config_bt() {
 __interrupt void USCI_A0_ISR(void) {
   // if the character is # the message has ended and we activate the flag so we
   // can read it
-  P1OUT ^= BIT0;
+
   char new_data = UCA0RXBUF; // read the internal buffer
   if (bt_index > BT_BUF_SIZE) {
     bt_index = 0;

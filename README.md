@@ -6,14 +6,14 @@ A robotics project consisting of assembling and programming a 2-Wheel-Drive (2WD
 
 To replicate this project, you will need the following parts:
 
-*   **Microcontroller:** Texas Instruments MSP430F5529 LaunchPad
-*   **Wireless Communication:** HC-05 Bluetooth Module
-*   **Motor Driver:** TB6612FNG Dual Motor Driver (More efficient than standard L298N)
-*   **Chassis & Actuators:** 2WD Robot Chassis Kit (Includes 2x DC Motors and wheels)
-*   **Power Supply (Logic):** Standard USB Power Bank 
-    * *(Includes the custom 3x 210Ω parallel resistor circuit to prevent auto-shutdown)*
-*   **Power Supply (Motors):** External Battery Pack (to independently power the TB6612FNG and motors)
-*   **Prototyping:** Standard Breadboard and jumper wires
+- **Microcontroller:** Texas Instruments MSP430F5529 LaunchPad
+- **Wireless Communication:** HC-05 Bluetooth Module
+- **Motor Driver:** TB6612FNG Dual Motor Driver (More efficient than standard L298N)
+- **Chassis & Actuators:** 2WD Robot Chassis Kit (Includes 2x DC Motors and wheels)
+- **Power Supply (Logic):** Standard USB Power Bank
+    - _(Includes the custom 3x 210Ω parallel resistor circuit to prevent auto-shutdown)_
+- **Power Supply (Motors):** External Battery Pack (to independently power the TB6612FNG and motors)
+- **Prototyping:** Standard Breadboard and jumper wires
 
 ---
 
@@ -23,7 +23,7 @@ To replicate this project, you will need the following parts:
 
 <img width="278" height="450" alt="robot" src="https://github.com/user-attachments/assets/a1d4474d-0b57-4111-bd42-6c51fad623fa" />
 
-**Want to hear the motors and see the full test runs?** 
+**Want to hear the motors and see the full test runs?**
 
 [![Watch Short 1](https://img.shields.io/badge/YouTube-Test_Run_1-red?style=for-the-badge&logo=youtube)](https://youtube.com/shorts/GyfELeh25M4?si=cqAGC58dihnduHg8)
 [![Watch Short 2](https://img.shields.io/badge/YouTube-Test_Run_2-red?style=for-the-badge&logo=youtube)](https://youtube.com/shorts/uWUYhGvj8_0?si=G7VaVpL7Wf5WP6yT)
@@ -50,16 +50,18 @@ To facilitate communication, I developed a simple control interface using MIT Ap
 
 The programming was done in C using Code Composer Studio (CCS) 12.7.
 
-The software architecture follows a foreground-background pattern. The MSP430 continuously checks if the HC-05 has received new data (via an interrupt flag) and executes actions based on the user's commands. 
+The software architecture follows a foreground-background pattern. The MSP430 continuously checks if the HC-05 has received new data (via an interrupt flag) and executes actions based on the user's commands.
 The communication protocol is straightforward: the app sends a string of commands terminated by a special character (`#` by default).
 
 #### 🎮 Command Map
 
 **Independent Motor Control:**
-*   `LF#` / `LB#` : Left Motor Forward / Backward
-*   `RF#` / `RB#` : Right Motor Forward / Backward
-*   `LN#` / `RN#` : Left / Right Motor Stop (Neutral)
-*   `LS#` / `RS#` : Left Brake / Right Brake
+
+- `LF#` / `LB#` : Left Motor Forward / Backward
+- `RF#` / `RB#` : Right Motor Forward / Backward
+- `LN#` / `RN#` : Left / Right Motor Stop (Neutral)
+- `LS#` / `RS#` : Left Brake / Right Brake
 
 **Speed Control (PWM):**
-*   `C<value>#` : Adjusts the speed of the motors based on the slider position. For example, `C75#` sets the PWM duty cycle to 75.
+
+- `C<value>#` : Adjusts the speed of the motors based on the slider position. For example, `C7#` sets the PWM to 80 since the minimum (0) is a 10% dutycycle

@@ -40,8 +40,8 @@ static inline void mt_left_stop() {
   P1OUT |= BIT4;
 }
 static inline void mt_right_stop() {
-  P1OUT |= BIT5;
-  P1OUT |= BIT4;
+  P2OUT |= BIT0;
+  P2OUT |= BIT6;
 }
 static inline void mt_stop() {
   mt_left_stop();
@@ -65,5 +65,5 @@ static inline void mt_backward() {
 // configures the timer and the pins the motor needs to use
 void config_mt();
 // changes the behaviour of the motor depending of the receiving char
-void update_mt(char message[BT_BUF_SIZE]);
+void update_mt(char message[BT_RX_BUF_SIZE]);
 #endif

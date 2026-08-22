@@ -1,8 +1,5 @@
 #include "motor.h"
-#include "bluetooth.h"
-
 #include <ctype.h>
-
 #include <stdint.h>
 
 // configuration of the motor pins
@@ -26,16 +23,21 @@ void config_mt() {
   // P1.3 PWMB signal
   TA0CCTL2 |= OUTMOD_7;
 
-  // prepare the STBY pin
-  P8DIR |= BIT2;
   // the clock resets when the counters reachs 50, the velocity of the motor
   // changes with the duty cycles
   TA0CCR0 = 50;
   TA0CCR2 = 40;
   TA0CCR1 = 40;
 
+  // prepare the STBY pin
+  P8DIR |= BIT2;
   // we star with the syby
   P8OUT |= BIT2;
+  // neutral configuration
+  P1OUT &= ~BIT4;
+  P1OUT &= ~BIT5;
+  P2OUT &= ~BIT0;
+  P2OUT &= ~BIT6;
 }
 
 // bluetooth motor control
@@ -56,7 +58,6 @@ void update_mt(char *message) {
       mt_left_forward();
       break;
 
-      break;
     case 'S': // stop ,active brake
       mt_left_stop();
       break;
@@ -80,16 +81,14 @@ void update_mt(char *message) {
     case 'S': // stop ,active brake
       mt_right_stop();
       break;
-
-      break;
     } // end of right motor switch
 
   case 'C':                    // change velocity
-    if (isdigit(message[1])) { // we check if the message is a digit number
-      uint8_t vel = message[1] - '0'; // since we can only receive in the
-                                      // porotoclo numbers this gives as the int
+    if (isdigit(message[1])) { // We check if the message is a digit number
+      uint8_t vel = message[1] - '0'; // Since we can only receive in the
+                                      // protocol numbers this gives as the int
                                       //
-      // vel is between 0  and 9 and sicne the max is 50 we add 5 as tghe
+      // vel is between 0 and 9 and since the max is 50 we add 5 as the
       // minimum vel
       TA0CCR2 = 5 * vel + 5;
       TA0CCR1 = 5 * vel + 5;
