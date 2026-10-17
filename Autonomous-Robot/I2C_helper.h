@@ -15,7 +15,9 @@
 #include <stdint.h>
 
 // ======== PORT DEFINES ==========
-#define MPU_DIRECTION 0x68 // normally the default direction of the MPU
+// the default direction of the MPU
+#define MPU_DIRECTION 0x68
+// direction of the sleep mode of the IMU
 #define PWR_MGMT_1 0x6B
 
 // Accelerometer

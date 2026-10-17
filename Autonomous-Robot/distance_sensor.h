@@ -36,43 +36,43 @@ extern volatile bool _ready_left;
 extern volatile bool _ready_right;
 
 // get the front time and turns off the is_ready flag
-static inline uint16_t ds_get_front_time() {
-  _ready_front = false;
-  return _ds_front_time;
+static inline uint16_t ds_get_front_time(void) {
+    _ready_front = false;
+    return _ds_front_time;
 }
-static inline uint16_t ds_get_left_time() {
-  _ready_left = false;
-  return _ds_left_time;
+static inline uint16_t ds_get_left_time(void) {
+    _ready_left = false;
+    return _ds_left_time;
 }
-static inline uint16_t ds_get_right_time() {
-  _ready_right = false;
-  return _ds_right_time;
+static inline uint16_t ds_get_right_time(void) {
+    _ready_right = false;
+    return _ds_right_time;
 }
 
-static inline uint16_t ds_right_is_ready() { return _ready_right; }
-static inline uint16_t ds_left_is_ready() { return _ready_left; }
-static inline uint16_t ds_front_is_ready() { return _ready_front; }
+static inline uint16_t ds_right_is_ready(void) { return _ready_right; }
+static inline uint16_t ds_left_is_ready(void) { return _ready_left; }
+static inline uint16_t ds_front_is_ready(void) { return _ready_front; }
 
 // configures the ports that of the distance sensor
-void config_ds();
+void config_ds(void);
 
 // triggers the front sensor
-static inline void ds_trig_front() {
-  P4OUT |= BIT2;
-  __delay_cycles(10);
-  P4OUT &= ~BIT2;
+static inline void ds_trig_front(void) {
+    P4OUT |= BIT2;
+    __delay_cycles(10);
+    P4OUT &= ~BIT2;
 }
 // triggers the left sensor
-static inline void ds_trig_left() {
-  P3OUT |= BIT2;
-  __delay_cycles(10);
-  P3OUT &= ~BIT2;
+static inline void ds_trig_left(void) {
+    P3OUT |= BIT2;
+    __delay_cycles(10);
+    P3OUT &= ~BIT2;
 }
 // triggers the right sensor
-static inline void ds_trig_right() {
-  P8OUT |= BIT1;
-  __delay_cycles(10);
-  P8OUT &= ~BIT1;
+static inline void ds_trig_right(void ) {
+    P8OUT |= BIT1;
+    __delay_cycles(10);
+    P8OUT &= ~BIT1;
 }
 
 #endif

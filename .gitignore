@@ -7,3 +7,4 @@ targetConfigs
 .clangd
 .cproject
 .clang-format
+.notas

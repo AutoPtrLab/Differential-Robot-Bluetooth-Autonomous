@@ -4,7 +4,7 @@ import pygame
 import serial
 
 START_BYTE = 0xAA
-PACKET_SIZE = 12
+PACKET_SIZE = 10
 
 
 def main():
@@ -90,10 +90,12 @@ def main():
         if payload is not None and len(payload) == PACKET_SIZE:
             robot_x = int.from_bytes(payload[0:4], byteorder="little", signed=True)
             robot_y = int.from_bytes(payload[4:8], byteorder="little", signed=True)
-            robot_ang = int.from_bytes(payload[8:12], byteorder="little", signed=True)
+            robot_ang = int.from_bytes(
+                payload[8:10], byteorder="little", signed=False
+            )  # this is now an uint16_t (BAM representation)
 
             print(
-                f"X: {robot_x / 1000000:.3f} | Y: {robot_y / 1000000:.3f} | Ángulo: {(robot_ang / 1000000) * 180 / 3.141592:.3f}"
+                f"X: {robot_x / 65536:.3f} | Y: {robot_y / 65536:.3f} | Ángulo: {(robot_ang / 65536.0) * 360.0:.1f}°"
             )
         # print(f"in_waiting: {ser.in_waiting}")
         screen.fill("grey")

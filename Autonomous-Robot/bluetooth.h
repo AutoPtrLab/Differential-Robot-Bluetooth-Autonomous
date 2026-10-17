@@ -32,20 +32,20 @@ extern volatile uint8_t _bt_rx_buffer[BT_RX_BUF_SIZE]; // registers that holds t
 // inline functions to improve scalation
 static inline bool bt_has_message(void) { return _bt_rx_flag; }
 // return a pointer to the first element of the array
-static inline char *bt_get_data() { return (char *)_bt_rx_buffer; }
+static inline char *bt_get_data(void) { return (char *)_bt_rx_buffer; }
 // clears the rx flag
 static inline void bt_clear_flag(void) { _bt_rx_flag = false; }
 
 // configures the bluetooth module
-void config_bt();
+void config_bt(void);
 
 // sends the signal to communicate with the master device
 
 // sends a message of x bytes to the receiver, if the previous message hasnt been completly sent
 // it just omits the new one, to use this function is recommend to packed the complex data
-// types so the padding doesnt disrupts the message, the funciton send first the start byte and
+// types so the padding doesnt disrupts the message, the function sends first the start byte and
 // second the len of the message(not counting the first two bytes),the functions also manages  the
 // interruptions  so the flags and IE register shouldnt be used (you can only send 255 bytes)
 void bt_send_data(const void *data, uint8_t total_bytes);
-
+ 
 #endif /* BLUETOOTH_H_ */

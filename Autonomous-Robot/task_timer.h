@@ -11,6 +11,7 @@
 #define TASK_TIMER_H
 #include "config.h"
 #include <msp430.h>
+#include <stdbool.h>
 #define ACLK_HZ 32768UL
 // Task frequency (using the 32 768 Hz clock)
 //
@@ -19,8 +20,9 @@
 // left and right sensor frequency
 #define LEFT_RIGHT_DS_CYCLES (uint16_t)((LEFT_RIGHT_DS_MS * ACLK_HZ) / 1000UL)
 #define POSITION_UPDATE_CYCLES (uint16_t)((POSITION_UPDATE_MS * ACLK_HZ) / 1000UL)
-
-// configuration of the Master clock that determines the frequency of the tasks
-void config_task_timer();
+#define CONTROL_UPDATE_CYCLES (uint16_t)((CONTROL_UPDATE_MS * ACLK_HZ)/1000UL)
+extern volatile bool debug_main_loop 
+;// configuration of the Master clock that determines the frequency of the tasks
+void config_task_timer(void);
 
 #endif

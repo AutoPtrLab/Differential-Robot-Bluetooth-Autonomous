@@ -1,0 +1,13 @@
+!SESSION 2026-10-16 19:31:23.990 -----------------------------------------------
+eclipse.buildId=4.23.0.I20220308-0310
+java.version=11.0.13
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Framework arguments:  -application com.ti.ccstudio.apps.projectBuild -ccs.projects MiRobot
+Command-line arguments:  -os linux -ws gtk -arch x86_64 -data ~/workspace_v12 -application com.ti.ccstudio.apps.projectBuild -ccs.projects MiRobot
+
+!ENTRY com.ti.common.core 1 0 2026-10-16 19:31:26.620
+!MESSAGE path=ccs_base/DebugServer
+
+!ENTRY com.ti.common.core 1 0 2026-10-16 19:31:26.623
+!MESSAGE debugServerDir=/home/autoptr/ti/ccs1271/ccs/ccs_base/DebugServer
