@@ -8,3 +8,5 @@ targetConfigs
 .cproject
 .clang-format
 .notas
+.settings
+workspcae_v12
