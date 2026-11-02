@@ -8,7 +8,7 @@
 volatile bool debug_main_loop = false;
 
 void config_task_timer() {
-    TB0CTL = TBCLR | MC_2 | TBSSEL_2 | ID_0; // continous mode, 32 768 Hz,
+    TB0CTL = TBCLR | MC_2 | TBSSEL_1 | ID_0; // continous mode, 32 768 Hz,
 
     // activating the interruptions of the compare blocks
 

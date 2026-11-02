@@ -20,7 +20,7 @@
 // =============
 
 // this shouldnt be below 50ms so the sensor has time to receive
-#define FRONT_DS_MS 70U
+#define FRONT_DS_MS 100U
 // this shouldnt be below 50ms so the sensor has time to receive the wave
 #define LEFT_RIGHT_DS_MS 200U
 
@@ -28,7 +28,7 @@
 // this shouldnt be to late in case the encoders
 // overflows, depends of the velocity and how precise
 // is the encoder
-#define POSITION_UPDATE_MS 300U
+#define POSITION_UPDATE_MS 200U
 // this is the timer for the control of the motors
 //  this timer should always be less than the position update
 #define CONTROL_UPDATE_MS 50U

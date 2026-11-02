@@ -62,19 +62,18 @@ static inline void mt_backward() {
     mt_left_backward();
     mt_right_backward();
 }
-static inline void mt_change_left_speed(uint8_t new_speed){
-    if (new_speed > 50){
+static inline void mt_change_left_speed(uint8_t new_speed) {
+
+    if (new_speed > 50) {
         new_speed = 50;
     }
     TA0CCR1 = new_speed;
-    
 }
-static inline void mt_change_right_speed(uint8_t new_speed){
-    if (new_speed > 50){
+static inline void mt_change_right_speed(uint8_t new_speed) {
+    if (new_speed > 50) {
         new_speed = 50;
     }
     TA0CCR2 = new_speed;
-    
 }
 // changes the motor speed, it goes from 0 to 50
 static inline void mt_change_speed(uint8_t new_speed) {

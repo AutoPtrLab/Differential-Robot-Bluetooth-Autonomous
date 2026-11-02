@@ -1,11 +1,8 @@
 #include "trigonometry_helper.h"
 #include <stdint.h>
 
-
-
-
-//definition of the look up table
-const int32_t look_up_table[4096] = {
+// definition of the look up table
+const int32_t _look_up_table[4096] = {
     0,      101,    201,    302,    402,    503,    603,    704,    804,    905,    1005,   1106,
     1206,   1307,   1407,   1508,   1608,   1709,   1809,   1910,   2010,   2111,   2211,   2312,
     2412,   2513,   2613,   2714,   2814,   2914,   3015,   3115,   3216,   3316,   3417,   3517,

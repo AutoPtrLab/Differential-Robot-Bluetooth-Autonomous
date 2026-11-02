@@ -1,4 +1,5 @@
 #include "odometry.h"
+#include "I2C_helper.h"
 #include "config.h"
 
 #include "math_helper.h"
@@ -52,6 +53,8 @@ void config_odometry(void) {
 
     // // we enable the MPU
     I2C_write_data(PWR_MGMT_1, 0); // we set the sleep to zero
+    __delay_cycles(1000000);
+    I2C_write_data(CONFIG_DIRECTION, 0x6); // setting the low-pass filter at the maximum value
 
     _gyro_z_offset = set_gyro_offset(10);
 }
@@ -61,7 +64,9 @@ q16_t get_filtered_gyro(void) {
     static q16_t gyro_data[4] = {0, 0, 0, 0}; // array of past values
     static uint8_t gyro_id = 0;               // index of the gyro data
     // we get the raw data
-    q16_t raw = get_gyro_z() - _gyro_z_offset;
+    q16_t raw = get_gyro_z();
+    raw = raw - _gyro_z_offset;
+
     gyro_data[gyro_id] = raw;
     gyro_id = (gyro_id + 1) & 3; // & 3 == % 4
 
@@ -71,8 +76,8 @@ q16_t get_filtered_gyro(void) {
         temp[i] = gyro_data[i];
     }
     // bubble sort
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3 - i; j++) {
+    for (uint8_t i = 0; i < 3; i++) {
+        for (uint8_t j = 0; j < 3 - i; j++) {
             if (temp[j] > temp[j + 1]) {
                 q16_t aux = temp[j];
                 temp[j] = temp[j + 1];
@@ -81,7 +86,7 @@ q16_t get_filtered_gyro(void) {
         }
     }
     // median of the array
-    q16_t filtered_val = (temp[1] + temp[2]) >> 2;
+    q16_t filtered_val = (temp[1] + temp[2]) >> 1;
     // dead zone to prevent small noise
     if (filtered_val < 600 && filtered_val > -600) {
         filtered_val = 0;
@@ -128,7 +133,7 @@ void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
 
     // calculation of the angle
     q16_t gyro_delta_q16 = (q16_t)(((int64_t)ang_vel_q16 * (int64_t)dt) / 32768LL);
-    gyro_delta_q16 = (q16_t)((int64_t)((int64_t)ang_vel_q16 * POSITION_UPDATE_MS) / 1000);
+    // q16_t gyro_delta_q16 = (q16_t)((int64_t)((int64_t)ang_vel_q16 * POSITION_UPDATE_MS) / 1000);
     ang_unit gyro_delta = (ang_unit)(((int64_t)gyro_delta_q16 * INV_2PI_X2_32) >> 32);
 
     // cast to int  so we can have negative numbers back and ca
@@ -149,8 +154,14 @@ void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
 q16_t set_gyro_offset(uint8_t samples) {
     int64_t total = 0;
     for (int i = 0; i < samples; i++) {
-        total += get_gyro_z();
-        __delay_cycles(60000); // waits 0.2 sec
+        int32_t raw = get_gyro_z();
+        if (raw > 30000 || raw < -30000) {
+            i--;
+            continue;
+        }
+
+        total += raw;
+        __delay_cycles(60000);
     }
     return total / samples;
 }
@@ -169,7 +180,7 @@ __interrupt void port1_ISR(void) {
         P1IFG &= ~BIT6; // clean the int flag
     }
     if (P1IFG & BIT7) { // debug stop
-        P1IFG &= ~BIT6;
+        P1IFG &= ~BIT7;
     }
 }
 

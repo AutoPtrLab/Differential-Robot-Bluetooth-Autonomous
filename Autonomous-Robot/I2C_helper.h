@@ -19,6 +19,8 @@
 #define MPU_DIRECTION 0x68
 // direction of the sleep mode of the IMU
 #define PWR_MGMT_1 0x6B
+// direction of the configuration register
+#define CONFIG_DIRECTION 0x1A
 
 // Accelerometer
 #define ACCEL_XOUT_H 0x3B

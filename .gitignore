@@ -10,3 +10,7 @@ targetConfigs
 .notas
 .settings
 workspace_v12/.metadata
+*.o
+*.elf
+.cache/
+compile_commands.json

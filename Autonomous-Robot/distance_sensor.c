@@ -21,10 +21,6 @@ volatile uint16_t _ds_front_time = 0;
 volatile uint16_t _ds_left_time = 0;
 volatile uint16_t _ds_right_time = 0;
 
-volatile bool _ready_front = false;
-volatile bool _ready_left = false;
-volatile bool _ready_right = false;
-
 void config_ds() {
     // triggers
     P4DIR |= BIT2;
@@ -36,7 +32,7 @@ void config_ds() {
     P2SEL |= BIT5 | BIT4 | BIT3;
 
     // timer TA2 configuration ,compare mode
-    // since the maximun in can reach is 38 ms (when there is no obstacule)
+    // since the maximun it can reach is 38 ms (when there is no obstacule)
     // we use the 1Mhz and still doesnt overflow
     TA2CTL &= ~TAIFG;                         // clean int flag
     TA2CTL |= TASSEL_2 | ID_0 | MC_2 | TACLR; // continuos mode and 1Mhz
@@ -63,7 +59,6 @@ __interrupt void right_ISR(void) {
       // has lasted
     else {
         _ds_right_time = TA2R - aux_right;
-        _ready_right = true; // ready to check
     }
     TA2CCTL0 &= ~CCIFG; // we clean the flag
 }
@@ -82,7 +77,6 @@ __interrupt void left_front_ISR(void) {
           // seconds has lasted
         else {
             _ds_front_time = TA2R - aux_front;
-            _ready_front = true; // ready to check
         }
         TA2CCTL2 &= ~CCIFG; // we clean the flag
     }
@@ -95,7 +89,6 @@ __interrupt void left_front_ISR(void) {
           // secons has lasted
         else {
             _ds_left_time = TA2R - aux_left;
-            _ready_left = true; // ready to check
         }
         TA2CCTL1 &= ~CCIFG; // we clean the flag
     }

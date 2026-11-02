@@ -56,7 +56,7 @@ uint8_t I2C_read_data(uint8_t address) {
         // waits until the receiver buffer holds a complete character
     }
 
-    //  UCB0IFG &= ~UCRXIFG; // clean the receiver flag
+    UCB0IFG &= ~UCRXIFG; // clean the receiver flag
 
     return (uint8_t)UCB0RXBUF;
 }
@@ -71,6 +71,7 @@ void I2C_read_mult_data(uint8_t first_address, uint8_t *arr, uint8_t length) {
         return;
     }
 
+    (void)UCB0RXBUF;
     UCB0CTL1 |= (UCTR | UCTXSTT); // transmitter mode and start pulse
     while (!(UCB0IFG & UCTXIFG)) {
         // wait for the buffer

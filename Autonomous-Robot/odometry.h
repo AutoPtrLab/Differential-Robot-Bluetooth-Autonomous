@@ -30,6 +30,7 @@
 
 // ========GLOBAL VARIABLES=======
 
+// int32_t gyro_debug;
 // this vartiable is used in the interrupt rutine
 // in the task timer so is defined there
 extern volatile bool _is_update_pos_ready;
@@ -62,11 +63,14 @@ static inline q16_t get_gyro_z(void) {
     int16_t value = (int16_t)(((uint16_t)arr[0] << 8) |
                               (uint16_t)arr[1]); // conversion between two uint8 to the int16 value
                                                  // , we also divide by the
+
+    // gyro_debug = value;
+
     // since the scaling to get deegres pero second is to divide by 131 , and we want q16 rad/s we
     // multiply Pi/180 and then * 65536 , this gives as a
     //  constant of aroung 8.73 , multiplying by 2^16 * 8.73 and then dividing by 2^16 get us the
     //  Q16 rad/s
-    return (q16_t)(((int32_t)value * 572224L) >> 16);
+    return (q16_t)(((int64_t)value * 572224L) >> 16);
 }
 
 // configuration of the encoder ports
