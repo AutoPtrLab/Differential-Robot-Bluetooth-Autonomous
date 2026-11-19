@@ -4,17 +4,18 @@
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
 
+#include "distance_sensor.h"
 #include "math_helper.h"
 #include "robot_info.h"
 
 // values to to calibrate the force camp system
-#define KATRACTIVE 131072
-#define KREPULSIVE 65536
+#define KATRACTIVE 1310720
+#define KREPULSIVE 36384
 // minimum distances that interferes with the robot
-#define MIN_DIST 1000
+#define MIN_DIST 10
+// maximum distance we want to believe our sensors
+#define MAX_DIST INT_TO_Q16(2)
 
-// this distance is the maximum dist we want the obstacle to be able to interfere with the robot
-#define MAX_DIST 7000
 // struct that returns the information for the controller
 typedef struct VelData {
     q16_t linear_vel;
@@ -31,4 +32,6 @@ VelData local_planer(Pose2D const robot_pos, Pose2D const desired_position);
 // also knows if the robot
 //  is searching a certain path or just exploring
 Pose2D global_planer(RobotInfo const info);
+// updates the occupancy grid
+void fill_occupancy_grid(const Pose2D *pose, const SensorDistances distances);
 #endif // NAVIGATION_H

@@ -20,14 +20,19 @@
 #include <stdint.h>
 //( 8-N-1), async mode
 //
-#define START_BYTE 0xAA
 // the first byte the micro sends so the master devices can receive the message
-#define PROTOCOL_TX_BYTES 2                        // start and len bytes
-extern volatile uint8_t _bt_tx_buffer[DATA_COUNT]; // copy of the info the bt needs to send
+#define START_BYTE 0xAA
+
+// bytes that the protocol needs to send message
+
+#define PROTOCOL_TX_BYTES 2
+extern volatile uint8_t
+    _bt_tx_buffer[DATA_COUNT + PROTOCOL_TX_BYTES]; // copy of the info the bt needs to send
 
 extern volatile bool _bt_rx_flag;                      // flag indicating there is a new word in
                                                        // the data register
 extern volatile uint8_t _bt_rx_buffer[BT_RX_BUF_SIZE]; // registers that holds the new data
+extern volatile bool _is_tx_ready; // flag describing the status of the sending process
 
 // inline functions to improve scalation
 static inline bool bt_has_message(void) { return _bt_rx_flag; }
@@ -35,6 +40,8 @@ static inline bool bt_has_message(void) { return _bt_rx_flag; }
 static inline char *bt_get_data(void) { return (char *)_bt_rx_buffer; }
 // clears the rx flag
 static inline void bt_clear_flag(void) { _bt_rx_flag = false; }
+// return if the tx is ready to be sent
+static inline bool bt_tx_is_ready(void) { return _is_tx_ready; }
 
 // configures the bluetooth module
 void config_bt(void);
@@ -44,8 +51,9 @@ void config_bt(void);
 // sends a message of x bytes to the receiver, if the previous message hasnt been completly sent
 // it just omits the new one, to use this function is recommend to packed the complex data
 // types so the padding doesnt disrupts the message, the function sends first the start byte and
-// second the len of the message(not counting the first two bytes),the functions also manages  the
-// interruptions  so the flags and IE register shouldnt be used (you can only send 255 bytes)
-void bt_send_data(const void *data, uint8_t total_bytes);
- 
+// second and third the len of the message(not counting the protocol bytes),the functions also
+// manages  the interruptions  so the flags and IE register shouldnt be used
+
+void bt_send_data(const void *data, uint8_t total_bytes, uint8_t start_bytes);
+
 #endif /* BLUETOOTH_H_ */

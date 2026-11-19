@@ -3,7 +3,9 @@
 #include "config.h"
 
 #include "math_helper.h"
+#include "motor.h"
 #include "msp430f5529.h"
+#include "occupancy_grid.h"
 #include "robot_info.h"
 #include "trigonometry_helper.h"
 
@@ -13,6 +15,8 @@
 // Right encoder 1.6
 //
 //
+
+volatile bool stop_robot = true;
 
 // encoders
 
@@ -27,26 +31,29 @@ q16_t _gyro_z_offset = 0;
 
 q16_t debug_gyro = 0;
 
+q16_t dist_debug = 0;
 void config_odometry(void) {
-    P1DIR &= ~BIT6;
+    P1DIR &= ~(BIT6 | BIT1);
+
     P2DIR &= ~BIT7;
     P2REN |= BIT7;
     P2OUT |= BIT7;  // Pull up res
     P2SEL &= ~BIT7; //
 
-    P1REN |= BIT6;  //
-    P1OUT |= BIT6;  // Pull up res
-    P1SEL &= ~BIT6; // GPIO
+    P1REN |= BIT6 | BIT1;    //
+    P1OUT |= BIT6 | BIT1;    // Pull up res
+    P1SEL &= ~(BIT6 | BIT1); // GPIO
     // clean int flags
-    P1IFG &= ~BIT6;
+    P1IFG &= ~(BIT6 | BIT1);
     P2IFG &= ~BIT7;
 
-    P1IES |= BIT6;
+    P1IES |= BIT6 | BIT1;
     P2IES |= BIT7;
 
     // activate the interrupts
     P2IE |= BIT7;
-    P1IE |= BIT6;
+    P1IE |= BIT6 | BIT1;
+
     // the configutration for the debug button
 
     config_I2C(); // configures the connection with the IMU
@@ -72,12 +79,12 @@ q16_t get_filtered_gyro(void) {
 
     // temp array to make the modifications and not touching the original array
     q16_t temp[4];
-    for (int i = 0; i < 4; i++) {
+    for (unsigned int i = 0; i < 4; i++) {
         temp[i] = gyro_data[i];
     }
     // bubble sort
-    for (uint8_t i = 0; i < 3; i++) {
-        for (uint8_t j = 0; j < 3 - i; j++) {
+    for (unsigned int i = 0; i < 3; i++) {
+        for (unsigned int j = 0; j < 3 - i; j++) {
             if (temp[j] > temp[j + 1]) {
                 q16_t aux = temp[j];
                 temp[j] = temp[j + 1];
@@ -96,6 +103,7 @@ q16_t get_filtered_gyro(void) {
 }
 void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
 
+    dist_debug = enc_left;
     // calculate the delta time
     static uint16_t prev_time = 0; // variable that holds the previous instance this func was called
     __bic_SR_register(GIE);
@@ -113,11 +121,10 @@ void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
     // D = (dl+dr)/2
     q16_t dist_left = enc_left * Q16_PER_PULSE;   // distance the left wheel travels
     q16_t dist_right = enc_right * Q16_PER_PULSE; // distance the right wheel travels
-    q16_t dist = (dist_left + dist_right) /
-                 2; // Distance in Q16 meters taking in reference to the rotation center
+    q16_t dist = (dist_left + dist_right) >>
+                 1; // Distance in Q16 meters taking in reference to the rotation center
 
     // ANGULAR CALCULATION
-
     // rad = (dl - dr)/ (2*wheel_rot_center == wheel_wheel_dist)
 
     q16_t delta_theta_q16 = Q16_div(dist_right - dist_left, WHEEL_WHEEL_DIST_Q16);
@@ -132,7 +139,8 @@ void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
     ang_unit delta_theta = (ang_unit)(((int64_t)delta_theta_q16 * INV_2PI_X2_32) >> 32);
 
     // calculation of the angle
-    q16_t gyro_delta_q16 = (q16_t)(((int64_t)ang_vel_q16 * (int64_t)dt) / 32768LL);
+    q16_t gyro_delta_q16 = (q16_t)(((int64_t)ang_vel_q16 * (int64_t)dt) >>
+                                   15); // divide by 2^15 since the time is scaled
     // q16_t gyro_delta_q16 = (q16_t)((int64_t)((int64_t)ang_vel_q16 * POSITION_UPDATE_MS) / 1000);
     ang_unit gyro_delta = (ang_unit)(((int64_t)gyro_delta_q16 * INV_2PI_X2_32) >> 32);
 
@@ -142,9 +150,10 @@ void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
     // complementary filter normalize for dividing by 1024
     int32_t mixed_delta = ((int32_t)delta_gyr * 973) + ((int32_t)delta_enc * 51);
 
+    // division by 1024
     int16_t fused_delta = (int16_t)(mixed_delta >> 10);
     // mid point aproximation of the angle
-    ang_unit mid_angle = (ang_unit)(pose->ang + (fused_delta / 2));
+    ang_unit mid_angle = (ang_unit)(pose->ang + (fused_delta >> 1));
     // we calculate the new position before assigning the new angle
     pose->pos.x += Q16_mult(dist, Q16_cos(mid_angle));
     pose->pos.y += Q16_mult(dist, Q16_sin(mid_angle));
@@ -153,7 +162,7 @@ void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
 }
 q16_t set_gyro_offset(uint8_t samples) {
     int64_t total = 0;
-    for (int i = 0; i < samples; i++) {
+    for (uint8_t i = 0; i < samples; i++) {
         int32_t raw = get_gyro_z();
         if (raw > 30000 || raw < -30000) {
             i--;
@@ -163,7 +172,7 @@ q16_t set_gyro_offset(uint8_t samples) {
         total += raw;
         __delay_cycles(60000);
     }
-    return total / samples;
+    return (q16_t)(total / samples);
 }
 
 //===========\
@@ -179,8 +188,9 @@ __interrupt void port1_ISR(void) {
                         // fall of the pulse
         P1IFG &= ~BIT6; // clean the int flag
     }
-    if (P1IFG & BIT7) { // debug stop
-        P1IFG &= ~BIT7;
+    if (P1IFG & BIT1) { // debug stop
+        P1IFG &= ~BIT1;
+        stop_robot = !stop_robot;
     }
 }
 

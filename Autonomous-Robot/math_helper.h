@@ -12,7 +12,7 @@
 #define Q16_PI 205887
 
 // conversion from int, the number has to be maximum a 16 bits number
-#define INT_TO_Q16(x) (((q16_t)(x)) << 16)
+#define INT_TO_Q16(x) (((q16_t)(x)) * 65536L)
 // conversion from float
 #define FLOAT_TO_Q16(x) ((q16_t)((x) * 65536.0f))
 // conversion from q16 to int
@@ -66,14 +66,16 @@ static inline Vec2 VEC_sub(const Vec2 *a, const Vec2 *b) {
     return (Vec2){a->x - b->x, a->y - b->y};
 }
 
-// multiplication by an scalar
-Vec2 VEC_scalar_mut(const Vec2 *vec, q16_t scalar);
+// multiplication by an int scalar
+Vec2 VEC_scalar_mut(const Vec2 *vec, int16_t scalar);
+// multiplication by a Q16 scalar
+Vec2 VEC_scalar_Q16_mut(const Vec2 *vec, q16_t scalar);
 // lenght of the vector
 q16_t VEC_length(const Vec2 *vec);
 // lenght of the vector Sq ( No square root)
 // WARNING : this function returns a Q32.32 since is squared, is only valid to
 // compare it with other squared numbers
-int64_t VEC_lenght_sq(const Vec2 *vec);
+int64_t VEC_length_sq(const Vec2 *vec);
 // scalar product
 q16_t VEC_dot(const Vec2 *a, const Vec2 *b);
 #endif

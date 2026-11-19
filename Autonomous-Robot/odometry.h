@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 // Q16.16 meters that the robot drives per pulse
-#define Q16_PER_PULSE (q16_t)((WHEEL_DIAMETER_MM * Q16_PI) / (1000UL * (ENCODER_GAPS)))
+#define Q16_PER_PULSE (q16_t)((WHEEL_DIAMETER_MM * Q16_PI) / (1000UL * (ENCODER_GAPS * 2)))
 // distance between the two wheels
 #define WHEEL_WHEEL_DIST_Q16 (q16_t)(INT_TO_Q16(WHEEL_WHEEL_DIST_MM) / 1000)
 // (1/2PI) * 2^32 , this is used to pass from q16 rad to bam angles

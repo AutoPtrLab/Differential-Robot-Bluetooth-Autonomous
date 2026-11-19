@@ -1,0 +1,17 @@
+"./Autonomous-Robot/I2C_helper.obj"
+"./Autonomous-Robot/bluetooth.obj"
+"./Autonomous-Robot/control.obj"
+"./Autonomous-Robot/distance_sensor.obj"
+"./Autonomous-Robot/main.obj"
+"./Autonomous-Robot/math_helper.obj"
+"./Autonomous-Robot/motor.obj"
+"./Autonomous-Robot/navigation.obj"
+"./Autonomous-Robot/odometry.obj"
+"./Autonomous-Robot/task_timer.obj"
+"./Autonomous-Robot/trigonometry_helper.obj"
+"./Man-Controlled-Robot/bluetooth.obj"
+"./Man-Controlled-Robot/main.obj"
+"./Man-Controlled-Robot/motor.obj"
+"../lnk_msp430f5529.cmd"
+-llibmath.a
+-llibc.a

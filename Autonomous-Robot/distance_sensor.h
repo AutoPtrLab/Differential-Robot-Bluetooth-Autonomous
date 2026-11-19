@@ -47,11 +47,11 @@ extern volatile uint16_t _ds_right_time;
 // the most recent values
 
 // return the front distance,we need to check if,should be used with the GIE off
-static inline q16_t ds_get_front_dist(void) { return (q16_t)(_ds_front_time * 45) >> 4; }
+static inline q16_t ds_get_front_dist(void) { return (q16_t)((uint32_t)_ds_front_time * 45) >> 2; }
 // return the left distance,we need to check if,should be used with the GIE off
-static inline q16_t ds_get_left_dist(void) { return (q16_t)(_ds_left_time * 45) >> 4; }
+static inline q16_t ds_get_left_dist(void) { return (q16_t)((uint32_t)_ds_left_time * 45) >> 2; }
 // return the right distance,we need to check if,should be used with the GIE off
-static inline q16_t ds_get_right_dist(void) { return (q16_t)(_ds_right_time * 45) >> 4; }
+static inline q16_t ds_get_right_dist(void) { return (q16_t)((uint32_t)_ds_right_time * 45) >> 2; }
 // return all the distances in the array
 static inline SensorDistances ds_get_dist(void) {
     SensorDistances aux;

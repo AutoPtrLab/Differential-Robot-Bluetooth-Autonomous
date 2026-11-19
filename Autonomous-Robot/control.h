@@ -17,8 +17,7 @@ static inline bool is_control_update_ready_n_clean(void) {
     _is_update_control_ready = false;
     return aux;
 }
-// this function controls the robot receiving the desired position and the current
-// state of the robot, the parameters are micro rad /s and micrometers/s
-void update_control(q16_t linear_vel, q16_t ang_vel, int16_t left_enc, int16_t right_enc);
+// receives the apprixmate PWM value
+void update_control(int16_t linear_vel, int16_t ang_vel, int16_t left_enc, int16_t right_enc);
 
 #endif // CONTROL_H

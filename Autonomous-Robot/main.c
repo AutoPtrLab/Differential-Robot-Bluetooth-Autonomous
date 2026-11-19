@@ -1,7 +1,7 @@
-
-
 #include "control.h"
+// this distance is the maximum dist we want the obstacle to be able to interfere with the robot
 #include "navigation.h"
+#include "occupancy_grid.h"
 #include "odometry.h"
 
 #include "bluetooth.h"
@@ -24,11 +24,13 @@ void init_variables(void);
 static RobotInfo robot_info;
 static VelData desired_vel;
 static Pose2D desired_pos;
+SensorDistances d;
 
 void init_variables(void) {
     robot_info = default_robot_info();
     desired_vel = (VelData){0, 0};
     desired_pos = (Pose2D){(Vec2){0, 0}, 0};
+    init_grid();
 }
 
 int main(void) {
@@ -36,6 +38,7 @@ int main(void) {
     WDTCTL = WDTPW | WDTHOLD; // stop watchdog timer
 
     P1DIR |= BIT0;
+    // P1OUT |= BIT0;
     P4DIR |= BIT7;
     config_ports();
 
@@ -68,16 +71,17 @@ int main(void) {
 
             prev_left_encoder = left_encoder;
             prev_right_encoder = right_encoder;
+
+            fill_occupancy_grid(&robot_info.pose, ds_get_dist());
             // planning the next step
             desired_pos = global_planer(robot_info);
-
             desired_vel = local_planer(robot_info.pose, desired_pos);
             // sending the bluetooth data
-            bt_send_data(&robot_info.pose, 10);
+            bt_send_data(&robot_info.pose, 10, START_BYTE);
+            d = ds_get_dist();
+            // bt_send_data(&d, 12);
+
             debug_main_loop = false;
-        }
-        if (debug_main_loop) { // pin indicating that the main loop is not as quick as it need to be
-            P1OUT ^= BIT0;
         }
         // navegation and control
         if (is_control_update_ready_n_clean()) {
@@ -90,11 +94,16 @@ int main(void) {
             int16_t right_encoder = enc_get_right();
             __bis_SR_register(GIE);
 
-            update_control(desired_vel.linear_vel, desired_vel.ang_vel,
-                           left_encoder - prev_left_encoder, right_encoder - prev_right_encoder);
+            // update_control(desired_vel.linear_vel, desired_vel.ang_vel,
+            // left_encoder - prev_left_encoder, right_encoder - prev_right_encoder);
 
             prev_left_encoder = left_encoder;
             prev_right_encoder = right_encoder;
+        }
+        if (stop_robot) {
+            robot_info.nav_state = NAV_STOP;
+        } else {
+            robot_info.nav_state = NAV_EXPLORING;
         }
     }
     return 0;

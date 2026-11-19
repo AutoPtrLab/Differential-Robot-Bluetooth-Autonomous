@@ -7,10 +7,10 @@
 
 #include "msp430f5529.h"
 
-volatile uint8_t _bt_tx_buffer[DATA_COUNT] = {0}; // trasmission buffer
+volatile uint8_t _bt_tx_buffer[DATA_COUNT + PROTOCOL_TX_BYTES] = {0}; // trasmission buffer
 // private tx index
 static volatile uint8_t _bt_tx_index = 0;
-static volatile bool _is_tx_ready = true; // flag describing the status of the sending process
+volatile bool _is_tx_ready = true; // flag describing the status of the sending process
 
 static int16_t _bt_tx_bytes = 0; // how many bytes we have to send
 
@@ -45,14 +45,15 @@ void config_bt() {
     _is_tx_ready = true; // activate the trasmission flag
 }
 
-void bt_send_data(const void *data, uint8_t total_bytes) {
+void bt_send_data(const void *data, uint8_t total_bytes, uint8_t start_bytes) {
     // if the tx isnt ready we omit the new data
 
     if (!_is_tx_ready) {
         return;
     }
-    // if the total_bytes are larger than the array
-    if (total_bytes + PROTOCOL_TX_BYTES > DATA_COUNT) {
+    // if the total_bytes are larger than the array(the array is DataCount + the protocol bytes so
+    // is no problem)
+    if (total_bytes > DATA_COUNT) {
         return;
     }
     _bt_tx_bytes = total_bytes + PROTOCOL_TX_BYTES;
@@ -60,26 +61,18 @@ void bt_send_data(const void *data, uint8_t total_bytes) {
     _is_tx_ready = false;
     //  deativate the ints
     __bic_SR_register(GIE);
-    _bt_tx_buffer[0] = START_BYTE;  // send start byte
+    _bt_tx_buffer[0] = start_bytes; // send start byte
     _bt_tx_buffer[1] = total_bytes; // send lenght of the message
     for (uint16_t i = 0; i < total_bytes; i++) {
         _bt_tx_buffer[i + PROTOCOL_TX_BYTES] = data_divider[i];
     }
     // reactivate the ints since the data has been copied
     __bis_SR_register(GIE);
-    UCA0TXBUF = _bt_tx_buffer[0]; // we send the first byte
-    UCA0IE |= UCTXIE; // activate the transmission interruptions that trigger every time the buffer
-    // has been emptied
     _bt_tx_index = 1; // the index always starts pointing to the second position in the tx buffer
+    UCA0IE |= UCTXIE; // activate the transmission interruptions that trigger every time the buffer
+    UCA0TXBUF = _bt_tx_buffer[0]; // we send the first byte
+    // has been emptied
 }
-
-// void bt_send_message(const void *data, uint16_t total_bytes) {
-
-//     // sending the head message to alert the other device
-//     bt_send_data(, uint16_t total_bytes);
-
-//     bt_send_data(data, length);
-// }
 
 #pragma vector = USCI_A0_VECTOR
 __interrupt void USCI_A0_ISR(void) {

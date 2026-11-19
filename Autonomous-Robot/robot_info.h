@@ -5,9 +5,12 @@
 
 #include "math_helper.h"
 #include "trigonometry_helper.h"
+#include <stdbool.h>
+
+extern volatile bool stop_robot;
 
 // Enum that represents the current status of the robot, so the global planner knows how to act
-typedef enum { NAV_EXPLORING, NAV_GUIDED } NavigationState;
+typedef enum { NAV_EXPLORING, NAV_GUIDED, NAV_STOP } NavigationState;
 typedef struct {
     Vec2 pos;     // two dimensional vector
     ang_unit ang; // BAM angle (wraps around automatically)
