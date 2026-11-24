@@ -76,7 +76,7 @@ static inline q16_t get_gyro_z(void) {
 // configuration of the encoder ports
 void config_odometry(void);
 // updates the position belief of the robot, it returns the pointer to the current belief
-void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right);
+void update_odometry(RobotInfo *info, int16_t enc_left, int16_t enc_right);
 
 // sets the gyroscope offset, receives the number of samples its going to take(the waiting for the
 // nex measure is 0.2s)

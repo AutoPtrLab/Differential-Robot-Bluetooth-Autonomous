@@ -101,7 +101,18 @@ q16_t get_filtered_gyro(void) {
 
     return filtered_val;
 }
-void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
+void update_odometry(RobotInfo *info, int16_t enc_left, int16_t enc_right) {
+
+    static int8_t stuck_counter = 0;
+    // if there is no moment we make the signal
+    // if (enc_left < 2 && enc_right < 2) {
+    // stuck_counter++;
+    // if (stuck_counter > 20) {
+    // info->is_stucked = true;
+    // }
+    // } else {
+    // stuck_counter = 0;
+    // }
 
     dist_debug = enc_left;
     // calculate the delta time
@@ -114,7 +125,7 @@ void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
 
     q16_t ang_vel_q16 = get_filtered_gyro(); // filter the IMU signal
 
-    debug_gyro = ang_vel_q16;
+    info->ang_vel = ang_vel_q16; // we inform the robot info about the current velocity
     // DISTANCE CALCULATION
 
     // dx = enc_cont * mm_per_pulse
@@ -153,12 +164,12 @@ void update_odometry(Pose2D *pose, int16_t enc_left, int16_t enc_right) {
     // division by 1024
     int16_t fused_delta = (int16_t)(mixed_delta >> 10);
     // mid point aproximation of the angle
-    ang_unit mid_angle = (ang_unit)(pose->ang + (fused_delta >> 1));
+    ang_unit mid_angle = (ang_unit)(info->pose.ang + (fused_delta >> 1));
     // we calculate the new position before assigning the new angle
-    pose->pos.x += Q16_mult(dist, Q16_cos(mid_angle));
-    pose->pos.y += Q16_mult(dist, Q16_sin(mid_angle));
+    info->pose.pos.x += Q16_mult(dist, Q16_cos(mid_angle));
+    info->pose.pos.y += Q16_mult(dist, Q16_sin(mid_angle));
     // we sum the angle
-    pose->ang = pose->ang + (ang_unit)fused_delta;
+    info->pose.ang = info->pose.ang + (ang_unit)fused_delta;
 }
 q16_t set_gyro_offset(uint8_t samples) {
     int64_t total = 0;
@@ -170,7 +181,7 @@ q16_t set_gyro_offset(uint8_t samples) {
         }
 
         total += raw;
-        __delay_cycles(60000);
+        __delay_cycles(600000);
     }
     return (q16_t)(total / samples);
 }
@@ -190,7 +201,13 @@ __interrupt void port1_ISR(void) {
     }
     if (P1IFG & BIT1) { // debug stop
         P1IFG &= ~BIT1;
-        stop_robot = !stop_robot;
+
+        static uint16_t last_ticks = 0;
+        uint16_t now = TB0R;
+        if ((uint16_t)(now - last_ticks) > 7000) {
+            stop_robot = !stop_robot;
+            last_ticks = now;
+        }
     }
 }
 

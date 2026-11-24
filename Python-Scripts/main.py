@@ -1,3 +1,4 @@
+import math
 import time
 
 import pygame
@@ -29,6 +30,11 @@ def main():
     is_a_press = False
     is_l_press = False
     is_k_press = False
+
+    # robot position
+    rx = 0.0
+    ry = 0.0
+    rang = 0.0
 
     map_buffer = bytearray()
     debug_grid = None
@@ -129,11 +135,25 @@ def main():
             robot_ang = int.from_bytes(
                 latest_pose[8:10], byteorder="little", signed=False
             )
+            rx = robot_x / 65536.0
+            ry = robot_y / 65536.0
+            rang = (robot_ang / 65536.0) * 2 * 3.14159  # radians
             print(
                 f"X: {robot_x / 65536:.3f} | Y: {robot_y / 65536:.3f} | Ángulo: {(robot_ang / 65536.0) * 360.0:.1f}°"
             )
         screen.fill("grey")
         draw_debug_grid(screen, debug_grid, cell_size=6)
+        tiles_per_meter = 8
+        px = int((rx * tiles_per_meter + 56) * 6)
+        py = int((112 - (ry * tiles_per_meter + 56)) * 6)
+        pygame.draw.circle(screen, "red", (px, py), 6)
+        pygame.draw.line(
+            screen,
+            "yellow",
+            (px, py),
+            (px + math.cos(-rang) * 12, py + math.sin(-rang) * 12),
+            2,
+        )
         pygame.display.flip()
 
         clock.tick(30)
@@ -167,18 +187,38 @@ def read_packet(ser):
     return msg_type, payload
 
 
-def draw_debug_grid(screen, debug_grid, cell_size=12, offset_x=0, offset_y=0):
+def draw_debug_grid(
+    screen,
+    debug_grid,
+    cell_size=12,
+    offset_x=0,
+    offset_y=0,
+    flip_y=True,
+    flip_x=False,
+    transpose=False,
+):
     if debug_grid is None:
         return
 
+    n_rows = len(debug_grid)
+    n_cols = len(debug_grid[0]) if n_rows else 0
+
+    width = n_rows if transpose else n_cols
+    height = n_cols if transpose else n_rows
+
     for r, row in enumerate(debug_grid):
         for c, val in enumerate(row):
+            gx, gy = (r, c) if transpose else (c, r)
+
+            sx = (width - 1 - gx) if flip_x else gx
+            sy = (height - 1 - gy) if flip_y else gy
+
             level = (15 - min(max(val, 0), 15)) * 17
-            color = (level, level, level)  # 0 = negro (vacío), 15 = blanco (seguro)
+            color = (level, level, level)
 
             rect = (
-                offset_x + c * cell_size,
-                offset_y + r * cell_size,
+                offset_x + sx * cell_size,
+                offset_y + sy * cell_size,
                 cell_size,
                 cell_size,
             )

@@ -36,8 +36,8 @@ void update_control(int16_t linear_vel, int16_t ang_vel, int16_t left_enc, int16
         left = -left;
     }
 
-    if (left < 20)
-        left = 20;
+    if (left < 18)
+        left = 18;
     mt_change_left_speed((uint8_t)left);
 
     if (right > 0) {
@@ -50,8 +50,8 @@ void update_control(int16_t linear_vel, int16_t ang_vel, int16_t left_enc, int16
         right = -right;
     }
 
-    if (right < 20)
-        right = 20;
+    if (right < 18)
+        right = 18;
     mt_change_right_speed((uint8_t)right);
 }
 

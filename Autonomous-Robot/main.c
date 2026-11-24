@@ -66,25 +66,25 @@ int main(void) {
             int16_t left_encoder = enc_get_left();
             int16_t right_encoder = enc_get_right();
             __bis_SR_register(GIE);
-            update_odometry(&robot_info.pose, left_encoder - prev_left_encoder,
+            update_odometry(&robot_info, left_encoder - prev_left_encoder,
                             right_encoder - prev_right_encoder);
 
             prev_left_encoder = left_encoder;
             prev_right_encoder = right_encoder;
 
-            fill_occupancy_grid(&robot_info.pose, ds_get_dist());
+            fill_occupancy_grid(&robot_info, ds_get_dist());
             // planning the next step
-            desired_pos = global_planer(robot_info);
-            desired_vel = local_planer(robot_info.pose, desired_pos);
+            desired_pos = global_planer(&robot_info);
+            desired_vel = local_planer(&robot_info, desired_pos);
             // sending the bluetooth data
             bt_send_data(&robot_info.pose, 10, START_BYTE);
-            d = ds_get_dist();
+            // d = ds_get_dist();
             // bt_send_data(&d, 12);
 
             debug_main_loop = false;
         }
         // navegation and control
-        if (is_control_update_ready_n_clean()) {
+        if (is_control_update_ready_n_clean() && robot_info.nav_state != NAV_GUIDED) {
             // variables that hold  the prev value;
             static int16_t prev_left_encoder = 0;
             static int16_t prev_right_encoder = 0;
@@ -94,16 +94,14 @@ int main(void) {
             int16_t right_encoder = enc_get_right();
             __bis_SR_register(GIE);
 
-            // update_control(desired_vel.linear_vel, desired_vel.ang_vel,
-            // left_encoder - prev_left_encoder, right_encoder - prev_right_encoder);
+            update_control(desired_vel.linear_vel, desired_vel.ang_vel,
+                           left_encoder - prev_left_encoder, right_encoder - prev_right_encoder);
 
             prev_left_encoder = left_encoder;
             prev_right_encoder = right_encoder;
         }
         if (stop_robot) {
             robot_info.nav_state = NAV_STOP;
-        } else {
-            robot_info.nav_state = NAV_EXPLORING;
         }
     }
     return 0;

@@ -1,4 +1,5 @@
 // helper for the navigation module to use the spacial _grid operations
+
 #ifndef OCCUPANCY_GRID_H
 #define OCCUPANCY_GRID_H
 #include "math_helper.h"
@@ -135,7 +136,7 @@ inline static void obstacle_update(const Vec2 *const origin, const Vec2 *const d
             av = (av + avr);
         }
     }
-    _update_cell(x, y, +3);
+    _update_cell(x, y, +4);
 }
 
 // is the same fucntion using the bresenham algorithm but does not find the obstacle
@@ -192,7 +193,7 @@ inline static void no_obstacle_update(const Vec2 *const origin, const Vec2 *cons
     int16_t x = x1;
     int16_t y = y1;
     while (x != x2 || y != y2) {
-        _update_cell(x, y, -1);
+        _update_cell(x, y, -2);
         if (av >= 0) {
             x += inc_xi;
             y += inc_yi;

@@ -9,12 +9,15 @@
 #include "robot_info.h"
 
 // values to to calibrate the force camp system
-#define KATRACTIVE 1310720
-#define KREPULSIVE 36384
-// minimum distances that interferes with the robot
-#define MIN_DIST 10
+#define KATRACTIVE 100720
+#define KREPULSIVE 0
+// minimum distance that interferes with the robot
+#define MIN_DIST 100
 // maximum distance we want to believe our sensors
-#define MAX_DIST INT_TO_Q16(2)
+#define MAX_DIST FLOAT_TO_Q16(0.8)
+
+// maximum of waypoints in the global planner por the JPS
+#define MAX_WAYPOINTS 36
 
 // struct that returns the information for the controller
 typedef struct VelData {
@@ -25,13 +28,13 @@ typedef struct VelData {
 // the local planner of the robot, this takes the desired position (return from the global planner)
 // and returns the ideal velocity to the controllers
 // This function receives position via value since the data is small
-VelData local_planer(Pose2D const robot_pos, Pose2D const desired_position);
+VelData local_planer(RobotInfo *info, Pose2D desired_position);
 // WARNING maybe pass the pointer if robot info grows too much
 
 // The global planner of the robot , this function takes care of the global routes of the robot and
 // also knows if the robot
 //  is searching a certain path or just exploring
-Pose2D global_planer(RobotInfo const info);
+Pose2D global_planer(RobotInfo *info);
 // updates the occupancy grid
-void fill_occupancy_grid(const Pose2D *pose, const SensorDistances distances);
+void fill_occupancy_grid(const RobotInfo *info, const SensorDistances distances);
 #endif // NAVIGATION_H
